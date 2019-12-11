@@ -13,6 +13,7 @@ import sys
 import numpy as np
 import cv2
 from PIL import Image
+from multiprocessing import Process
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(BASE_DIR)
@@ -149,7 +150,8 @@ def random_shift_box2d(box2d, shift_ratio=0.1):
 
 
 def extract_frustum_data(idx_filename, split, output_filename, viz=False,
-                         perturb_box2d=False, augmentX=1, type_whitelist=['Car']):
+                         perturb_box2d=False, augmentX=1,
+                         type_whitelist=['Car'],lidar_dir='velodyne'):
     ''' Extract point clouds and corresponding annotations in frustums
         defined generated from 2D bounding boxes
         Lidar points and 3d boxes are in *rect camera* coord system
@@ -168,7 +170,7 @@ def extract_frustum_data(idx_filename, split, output_filename, viz=False,
         None (will write a .pickle file to the disk)
     '''
     dataset = kitti_object(os.path.join(
-        ROOT_DIR, 'dataset/KITTI/object'), split)
+        ROOT_DIR, 'dataset/KITTI/object'), split,lidar_dir=lidar_dir)
     data_idx_list = [int(line.rstrip()) for line in open(idx_filename)]
 
     id_list = []  # int number
@@ -207,8 +209,8 @@ def extract_frustum_data(idx_filename, split, output_filename, viz=False,
                 # Augment data by box2d perturbation
                 if perturb_box2d:
                     xmin, ymin, xmax, ymax = random_shift_box2d(box2d)
-                    print(box2d)
-                    print(xmin,ymin,xmax,ymax)
+                    #print(box2d)
+                    #print(xmin,ymin,xmax,ymax)
                 else:
                     xmin, ymin, xmax, ymax = box2d
                 box_fov_inds = (pc_image_coord[:, 0] < xmax) & \
@@ -489,6 +491,7 @@ if __name__ == '__main__':
                         help='Generate val split frustum data with RGB detection 2D boxes')
     parser.add_argument('--car_only', action='store_true',
                         help='Only generate cars; otherwise cars, peds and cycs')
+    parser.add_argument('--lidar_dir')
     args = parser.parse_args()
 
     if args.demo:
@@ -501,22 +504,25 @@ if __name__ == '__main__':
     else:
         type_whitelist = ['Car', 'Pedestrian', 'Cyclist']
         output_prefix = 'frustum_carpedcyc_'
+    output_prefix = os.path.basename(os.path.dirname(args.lidar_dir))
 
     if args.gen_train:
-        extract_frustum_data(
+        p1 = Process(target=lambda :        extract_frustum_data(
             os.path.join(BASE_DIR, 'image_sets/train.txt'),
             'training',
             os.path.join(BASE_DIR, output_prefix+'train.pickle'),
             viz=False, perturb_box2d=True, augmentX=5,
-            type_whitelist=type_whitelist)
+            type_whitelist=type_whitelist,lidar_dir=args.lidar_dir))
+        p1.start()
 
     if args.gen_val:
-        extract_frustum_data(
+        p2 = Process(target=lambda:        extract_frustum_data(
             os.path.join(BASE_DIR, 'image_sets/val.txt'),
             'training',
             os.path.join(BASE_DIR, output_prefix+'val.pickle'),
             viz=False, perturb_box2d=False, augmentX=1,
-            type_whitelist=type_whitelist)
+            type_whitelist=type_whitelist,lidar_dir=args.lidar_dir))
+        p2.start()
 
     if args.gen_val_rgb_detection:
         extract_frustum_data_rgb_detection(
@@ -525,3 +531,6 @@ if __name__ == '__main__':
             os.path.join(BASE_DIR, output_prefix+'val_rgb_detection.pickle'),
             viz=False,
             type_whitelist=type_whitelist)
+
+    p1.join()
+    p2.join()

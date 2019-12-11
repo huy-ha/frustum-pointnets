@@ -4,4 +4,6 @@
 *.pickle
 *.txt
 *.dat
+*.pyc
 sunrgbd/
+train/*
