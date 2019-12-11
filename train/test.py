@@ -181,7 +181,8 @@ def write_detection_results(result_dir, id_list, type_list, box2d_list, center_l
     results = {}
     for i in range(len(center_list)):
         idx = id_list[i]
-        output_str = type_list[i].decode("utf-8") + " -1 -1 -10 "
+        #output_str = type_list[i].decode("utf-8") + " -1 -1 -10 "
+        output_str = type_list[i] + " -1 -1 -10 "
         box2d = box2d_list[i]
         output_str += "%f %f %f %f " % (box2d[0], box2d[1], box2d[2], box2d[3])
         h, w, l, tx, ty, tz, ry = provider.from_prediction_to_label_format(center_list[i],
