@@ -24,7 +24,7 @@ except NameError:
 class kitti_object(object):
     '''Load and parse object data into a usable format.'''
     
-    def __init__(self, root_dir, split='training'):
+    def __init__(self, root_dir, split='training',lidar_dir='velodyne'):
         '''root_dir contains training and testing folders'''
         self.root_dir = root_dir
         self.split = split
@@ -40,7 +40,7 @@ class kitti_object(object):
 
         self.image_dir = os.path.join(self.split_dir, 'image_2')
         self.calib_dir = os.path.join(self.split_dir, 'calib')
-        self.lidar_dir = os.path.join(self.split_dir, 'velodyne')
+        self.lidar_dir = os.path.join(self.split_dir, lidar_dir)
         self.label_dir = os.path.join(self.split_dir, 'label_2')
 
     def __len__(self):
