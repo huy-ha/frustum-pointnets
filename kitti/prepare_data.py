@@ -506,6 +506,9 @@ if __name__ == '__main__':
         output_prefix = 'frustum_carpedcyc_'
     output_prefix = os.path.basename(os.path.dirname(args.lidar_dir))
 
+    p1 = None
+    p2 = None
+
     if args.gen_train:
         p1 = Process(target=lambda :        extract_frustum_data(
             os.path.join(BASE_DIR, 'image_sets/train.txt'),
@@ -531,6 +534,7 @@ if __name__ == '__main__':
             os.path.join(BASE_DIR, output_prefix+'val_rgb_detection.pickle'),
             viz=False,
             type_whitelist=type_whitelist)
-
-    p1.join()
-    p2.join()
+    if p1 != None:
+        p1.join()
+    if p2 != None:
+        p2.join()
