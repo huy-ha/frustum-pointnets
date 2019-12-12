@@ -242,7 +242,7 @@ def test_from_rgb_detection(output_filename, result_dir=None):
     batch_data_to_feed = np.zeros((batch_size, NUM_POINT, NUM_CHANNEL))
     batch_one_hot_to_feed = np.zeros((batch_size, 3))
     sess, ops = get_session_and_ops(batch_size=batch_size, num_point=NUM_POINT)
-    for batch_idx in range(num_batches):
+    for batch_idx in range(int(num_batches)):
         print('batch idx: %d' % (batch_idx))
         start_idx = batch_idx * batch_size
         end_idx = min(len(TEST_DATASET), (batch_idx+1) * batch_size)
@@ -324,7 +324,7 @@ def test(output_filename, result_dir=None):
 
     sess, ops = get_session_and_ops(batch_size=batch_size, num_point=NUM_POINT)
     correct_cnt = 0
-    for batch_idx in range(num_batches):
+    for batch_idx in range(int(num_batches)):
         print('batch idx: %d' % (batch_idx))
         start_idx = batch_idx * batch_size
         end_idx = (batch_idx+1) * batch_size
