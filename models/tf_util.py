@@ -5,7 +5,8 @@ Date: November 2017
 """
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+import tensorflow as tf2
 
 def _variable_on_cpu(name, shape, initializer, use_fp16=False):
   """Helper to create a Variable stored on CPU memory.
@@ -39,7 +40,8 @@ def _variable_with_weight_decay(name, shape, stddev, wd, use_xavier=True):
     Variable Tensor
   """
   if use_xavier:
-    initializer = tf.contrib.layers.xavier_initializer()
+    initializer = tf2.initializers.GlorotUniform()
+    # initializer = tf.contrib.layers.xavier_initializer()
   else:
     initializer = tf.truncated_normal_initializer(stddev=stddev)
   var = _variable_on_cpu(name, shape, initializer)
@@ -156,9 +158,9 @@ def conv2d(inputs,
       kernel_h, kernel_w = kernel_size
       assert(data_format=='NHWC' or data_format=='NCHW')
       if data_format == 'NHWC':
-        num_in_channels = inputs.get_shape()[-1].value
+        num_in_channels = inputs.get_shape()[-1]
       elif data_format=='NCHW':
-        num_in_channels = inputs.get_shape()[1].value
+        num_in_channels = inputs.get_shape()[1]
       kernel_shape = [kernel_h, kernel_w,
                       num_in_channels, num_output_channels]
       kernel = _variable_with_weight_decay('weights',
@@ -524,10 +526,10 @@ def batch_norm_template(inputs, is_training, scope, moments_dims_unused, bn_deca
       normed:        batch-normalized maps
   """
   bn_decay = bn_decay if bn_decay is not None else 0.9
-  return tf.contrib.layers.batch_norm(inputs, 
+  return tf.layers.batch_normalization(inputs, 
                                       center=True, scale=True,
-                                      is_training=is_training, decay=bn_decay,updates_collections=None,
-                                      scope=scope,
+                                      training=is_training, momentum=bn_decay,
+                                      name=scope,
                                       data_format=data_format)
 
 

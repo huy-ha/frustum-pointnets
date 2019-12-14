@@ -130,6 +130,7 @@ class FrustumDataset(object):
                                                  'kitti/frustum_carpedcyc_%s.pickle' % (split))
 
         self.from_rgb_detection = from_rgb_detection
+        print("Currently pickle.loading({})".format(overwritten_data_path))
         if from_rgb_detection:
             with open(overwritten_data_path, 'rb') as fp:
                 self.id_list = pickle.load(fp, encoding='bytes')

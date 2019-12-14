@@ -331,7 +331,8 @@ def extract_frustum_data_rgb_detection(det_filename, split, output_filename,
                                        viz=False,
                                        type_whitelist=['Car'],
                                        img_height_threshold=25,
-                                       lidar_point_threshold=5):
+                                       lidar_point_threshold=5,
+                                       lidar_dir='velodyne'):
     ''' Extract point clouds in frustums extruded from 2D detection boxes.
         Update: Lidar points and 3d boxes are in *rect camera* coord system
             (as that in 3d box label files)
@@ -348,7 +349,7 @@ def extract_frustum_data_rgb_detection(det_filename, split, output_filename,
         None (will write a .pickle file to the disk)
     '''
     dataset = kitti_object(os.path.join(
-        ROOT_DIR, 'dataset/KITTI/object'), split)
+        ROOT_DIR, 'dataset/KITTI/object'), split,lidar_dir=lidar_dir)
     det_id_list, det_type_list, det_box2d_list, det_prob_list = \
         read_det_file(det_filename)
     cache_id = -1
@@ -504,7 +505,7 @@ if __name__ == '__main__':
     else:
         type_whitelist = ['Car', 'Pedestrian', 'Cyclist']
         output_prefix = 'frustum_carpedcyc_'
-    output_prefix = os.path.basename(os.path.dirname(args.lidar_dir))
+    output_prefix = os.path.basename(os.path.dirname(args.lidar_dir)) + "_"
 
     p1 = None
     p2 = None
@@ -533,7 +534,7 @@ if __name__ == '__main__':
             'training',
             os.path.join(BASE_DIR, output_prefix+'val_rgb_detection.pickle'),
             viz=False,
-            type_whitelist=type_whitelist)
+            type_whitelist=type_whitelist,lidar_dir=args.lidar_dir)
     if p1 != None:
         p1.join()
     if p2 != None:

@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import sys
 import os
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
